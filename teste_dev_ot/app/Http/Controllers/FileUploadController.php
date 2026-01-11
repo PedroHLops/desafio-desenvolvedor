@@ -19,9 +19,6 @@ class FileUploadController extends Controller
     public function upload(Request $request)
     {
         \Log::info("Upload iniciado - Tamanho do arquivo: " . ($request->file('file')->getSize() / 1024 / 1024) . " MB");
-        $request->validate([
-            'file' => 'required|file',
-        ]);
 
         try {
             $upload = $this->fileUploadService->processUpload(
