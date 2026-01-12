@@ -61,19 +61,6 @@ class ContentSearchService
             $perPage = min((int) $request->headers->get('per_page', 5000), 10000);
 
 
-            if ($filtersCount >= 2) {
-                return [
-                    'data' => [],
-                    'meta' => [
-                        'page' => $page,
-                        'per_page' => $perPage,
-                        'total' => 0,
-                        'pages' => 0,
-                        'reason' => 'Consulta bloqueada: muitos filtros enviados',
-                    ],
-                ];
-            }
-
             $cursor = $collection->find($filters, [
                 'limit' => $perPage,
                 'skip' => ($page - 1) * $perPage,
