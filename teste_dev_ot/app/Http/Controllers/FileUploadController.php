@@ -22,8 +22,7 @@ class FileUploadController extends Controller
 
         try {
             $upload = $this->fileUploadService->processUpload(
-                $request->file('file'),
-                auth()->id()
+                $request->file('file')
             );
 
             ProcessFileJob::dispatch($upload);

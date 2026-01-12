@@ -8,7 +8,7 @@ use DomainException;
 
 class FileUploadService
 {
-    public function processUpload($file, ?int $userId)
+    public function processUpload($file)
     {
         $hash = hash_file('sha256', $file->getRealPath());
 

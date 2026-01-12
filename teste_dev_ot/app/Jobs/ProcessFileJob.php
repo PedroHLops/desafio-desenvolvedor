@@ -13,7 +13,7 @@ class ProcessFileJob implements ShouldQueue
 {
     use Queueable;
 
-    public $timeout = 1800; 
+    public $timeout = 1800;
     public $tries = 3;
     public $maxExceptions = 5;
     public $backoff = [60, 300, 600];
@@ -35,22 +35,30 @@ class ProcessFileJob implements ShouldQueue
         try {
             $upload->markAsProcessing();
 
-            $config = [
-                'host' => env('MONGO_DB_HOST'),
-                'port' => env('MONGO_DB_PORT'),
-                'database' => env('MONGO_DB_DATABASE'),
-                'user' => env('MONGO_DB_USERNAME'),
-                'password' => env('MONGO_DB_PASSWORD'),
-            ];
+            $host = env('MONGO_DB_HOST', 'mongodb');
+            $port = env('MONGO_DB_PORT', 27017);
+            $database = env('MONGO_DB_DATABASE');
 
-            $dsn = sprintf(
-                'mongodb://%s:%s@%s:%s/%s?authSource=admin',
-                urlencode($config['user']),
-                urlencode($config['password']),
-                $config['host'],
-                $config['port'],
-                $config['database']
-            );
+            $user = env('MONGO_DB_USERNAME');
+            $password = env('MONGO_DB_PASSWORD');
+
+            if ($user && $password) {
+                $dsn = sprintf(
+                    'mongodb://%s:%s@%s:%s/%s?authSource=admin',
+                    urlencode($user),
+                    urlencode($password),
+                    $host,
+                    $port,
+                    $database
+                );
+            } else {
+                $dsn = sprintf(
+                    'mongodb://%s:%s/%s',
+                    $host,
+                    $port,
+                    $database
+                );
+            }
 
             $client = new Client($dsn, [
                 'connectTimeoutMS' => 30000,
@@ -58,15 +66,14 @@ class ProcessFileJob implements ShouldQueue
                 'serverSelectionTimeoutMS' => 30000,
             ]);
 
-            $collection = $client->selectDatabase($config['database'])
+
+            $collection = $client->selectDatabase($database)
                 ->selectCollection('instruments');
 
             if (!file_exists($upload->file_path)) {
                 throw new \Exception("Arquivo não encontrado: " . $upload->file_path);
             }
 
-
-            $totalLines = $this->countLines($upload->file_path);
 
             $handle = fopen($upload->file_path, 'r');
             if (!$handle) {
@@ -75,7 +82,7 @@ class ProcessFileJob implements ShouldQueue
 
             $header = null;
             $batch = [];
-            $batchSize = 5000; 
+            $batchSize = 5000;
             $imported = 0;
             $errors = 0;
             $startTime = microtime(true);
@@ -99,7 +106,7 @@ class ProcessFileJob implements ShouldQueue
                     ];
 
                     $row = array_pad($row, count($header), null);
-                    
+
                     if (count($header) !== count($row)) {
                         Log::warning("Header/row size mismatch. Header: " . count($header) . ", Row: " . count($row));
                         $errors++;
@@ -126,7 +133,7 @@ class ProcessFileJob implements ShouldQueue
                     if (count($batch) >= $batchSize) {
                         $this->insertBatch($collection, $batch);
                         $batch = [];
-                        
+
                         // LIBERAR MEMÓRIA
                         if ($imported % 50000 === 0) {
                             gc_collect_cycles();
@@ -147,16 +154,16 @@ class ProcessFileJob implements ShouldQueue
             }
 
             fclose($handle);
-            
+
 
             $upload->markAsCompleted();
 
         } catch (\Exception $e) {
-            
+
             if (isset($upload)) {
                 $upload->markAsFailed("Erro: " . $e->getMessage());
             }
-            
+
             throw $e; // Para queue retry
         }
     }
@@ -169,7 +176,7 @@ class ProcessFileJob implements ShouldQueue
         try {
             $result = $collection->insertMany($batch);
         } catch (\Exception $e) {
-            
+
             // Tentar inserir um por um para identificar o problema
             foreach ($batch as $doc) {
                 try {
@@ -188,14 +195,14 @@ class ProcessFileJob implements ShouldQueue
     {
         $linecount = 0;
         $handle = fopen($filePath, 'r');
-        
+
         while (!feof($handle)) {
             $line = fgets($handle);
             if ($line !== false && trim($line) !== '') {
                 $linecount++;
             }
         }
-        
+
         fclose($handle);
         return $linecount - 1; // Subtrai header
     }
@@ -222,24 +229,24 @@ class ProcessFileJob implements ShouldQueue
         }
 
         $encodings = ['UTF-8', 'ISO-8859-1', 'Windows-1252'];
-        
+
         foreach ($encodings as $encoding) {
             $utf8 = @iconv($encoding, 'UTF-8//IGNORE', $value);
             if ($utf8 !== false && mb_check_encoding($utf8, 'UTF-8')) {
                 return $utf8;
             }
         }
-        
+
         return $value;
     }
-    
+
     /**
      * Método opcional para falha no job
      */
     public function failed(\Throwable $exception): void
     {
         Log::error("Job ProcessFileJob falhou: " . $exception->getMessage());
-        
+
         $upload = FileUpload::find($this->fileUpload->id);
         if ($upload) {
             $upload->markAsFailed("Job falhou: " . $exception->getMessage());

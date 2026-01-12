@@ -11,28 +11,39 @@ class ContentSearchService
     public function search(Request $request): array
     {
         try {
-            $config = [
-                'host' => env('MONGO_DB_HOST'),
-                'port' => env('MONGO_DB_PORT'),
-                'database' => env('MONGO_DB_DATABASE'),
-                'user' => env('MONGO_DB_USERNAME'),
-                'password' => env('MONGO_DB_PASSWORD'),
-            ];
+            $host = env('MONGO_DB_HOST', 'mongodb');
+            $port = env('MONGO_DB_PORT', 27017);
+            $database = env('MONGO_DB_DATABASE');
 
-            $dsn = sprintf(
-                'mongodb://%s:%s@%s:%s/%s?authSource=admin',
-                urlencode($config['user']),
-                urlencode($config['password']),
-                $config['host'],
-                $config['port'],
-                $config['database']
-            );
+            $user = env('MONGO_DB_USERNAME');
+            $password = env('MONGO_DB_PASSWORD');
+
+            if ($user && $password) {
+                // COM autenticação
+                $dsn = sprintf(
+                    'mongodb://%s:%s@%s:%s/%s?authSource=admin',
+                    urlencode($user),
+                    urlencode($password),
+                    $host,
+                    $port,
+                    $database
+                );
+            } else {
+                // SEM autenticação
+                $dsn = sprintf(
+                    'mongodb://%s:%s/%s',
+                    $host,
+                    $port,
+                    $database
+                );
+            }
 
             $client = new Client($dsn);
+
             $client->listDatabases();
 
             $collection = $client
-                ->selectDatabase($config['database'])
+                ->selectDatabase($database)
                 ->selectCollection('instruments');
 
 
