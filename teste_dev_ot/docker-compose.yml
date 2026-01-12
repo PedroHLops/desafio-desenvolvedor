@@ -1,6 +1,5 @@
 ﻿version: "3.8"
 services:
-  # APLICAÇÃO WEB (já funciona)
   laravel.test:
     build:
       context: ./vendor/laravel/sail/runtimes/8.4
@@ -22,7 +21,6 @@ services:
       - mongodb
       - redis
 
-  # ✅ ADICIONE ESTE WORKER (para processar Redis Queue)
   laravel-worker:
     image: sail-8.4/app
     restart: unless-stopped
@@ -51,7 +49,6 @@ services:
     volumes:
       - "sail-mysql:/var/lib/mysql"
       - "./docker/mysql/my.cnf:/etc/mysql/conf.d/my.cnf"
-      # ❌ REMOVA: - "./docker/supervisor:/etc/supervisor/conf.d"
     networks:
       - sail
     healthcheck:
