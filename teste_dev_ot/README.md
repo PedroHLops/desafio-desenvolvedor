@@ -1,59 +1,121 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+📁 Desafio API de Upload e Busca de Arquivos (OT)
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Este projeto implementa uma API REST para upload robusto de arquivos CSV, com controle de duplicidade via hash, armazenamento dos dados importados e busca paginada no conteúdo dos arquivos.
 
-## About Laravel
+Todo o ambiente de desenvolvimento é conteinerizado com Docker Compose, garantindo padronização e facilidade de setup.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+🚀 Stack Utilizada
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+Linguagem: PHP ^8.2
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+Framework: Laravel ^12.0
 
-## Learning Laravel
+Banco de Dados: MySQL
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+Containerização: Docker & Docker Compose
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+Debug: laravel/tinker ^2.10.1
 
-## Laravel Sponsors
+Documentação: OpenAPI (Swagger)
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+📦 Funcionalidades
 
-### Premium Partners
+Upload de arquivos CSV via API
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+Controle de duplicidade utilizando hash do arquivo
 
-## Contributing
+Importação do conteúdo do CSV para o banco de dados
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+Histórico de arquivos enviados
 
-## Code of Conduct
+Busca paginada nos dados importados
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+Documentação interativa com Swagger UI
 
-## Security Vulnerabilities
+⚙️ Instalação e Configuração
+Pré-requisitos
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+Docker (Docker Engine + Docker CLI)
 
-## License
+Docker Compose (normalmente incluído no Docker Desktop)
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+🔧 Configurar o Ambiente
+
+Crie o arquivo .env a partir do .env.example e ajuste as variáveis abaixo:
+
+DB_CONNECTION=mysql
+DB_HOST=desafio-db-1
+DB_PORT=3306
+DB_DATABASE=desafio-ot
+DB_USERNAME=root
+DB_PASSWORD=senhadobancoaqui
+
+🐳 Build e Inicialização dos Containers
+
+Execute o comando abaixo para construir as imagens e iniciar os serviços (Laravel, Nginx e MySQL):
+
+docker-compose up --build -d
+
+🛠️ Configuração do Laravel
+
+Após os containers estarem ativos, execute os comandos dentro do container da aplicação:
+
+Instalar dependências PHP
+docker exec -it desafio-app-1 composer install
+
+Gerar a chave da aplicação
+docker exec -it desafio-app-1 php artisan key:generate
+
+Executar as migrações
+docker exec -it desafio-app-1 php artisan migrate
+
+🧪 Comandos Essenciais para Debug
+Visualizar logs do Laravel
+docker exec -it desafio-app-1 tail -f storage/logs/laravel.log
+
+Acessar o MySQL
+docker exec -it desafio-db-1 mysql -u root -p
+
+Limpar dados para novos testes
+
+Dentro do MySQL:
+
+USE `desafio-ot`;
+
+TRUNCATE TABLE uploaded_files;
+TRUNCATE TABLE file_contents;
+
+Acessar o bash do container da aplicação
+docker exec -it desafio-app-1 bash
+
+📚 Documentação da API (Swagger)
+
+A API possui documentação interativa utilizando Swagger UI.
+
+URL de acesso:
+
+GET http://localhost:8080/api/documentation
+
+🔌 Endpoints da API
+Upload de arquivo CSV
+
+Realiza o upload e importa o conteúdo do arquivo.
+
+POST /api/upload
+
+
+Espera multipart/form-data
+
+Campo obrigatório: file
+
+Histórico de uploads
+
+Lista todos os arquivos enviados.
+
+GET /api/history
+
+Busca no conteúdo dos arquivos
+
+Busca paginada (20 registros por página por padrão) nos dados importados.
+
+GET /api/file-content
