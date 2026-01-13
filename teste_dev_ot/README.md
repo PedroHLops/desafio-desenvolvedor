@@ -1,121 +1,118 @@
-📁 Desafio API de Upload e Busca de Arquivos (OT)
+# 📁 Desafio API de Upload e Busca de Arquivos (OT)
 
-Este projeto implementa uma API REST para upload robusto de arquivos CSV, com controle de duplicidade via hash, armazenamento dos dados importados e busca paginada no conteúdo dos arquivos.
+> API REST para upload robusto de arquivos CSV, controle de duplicidade via hash e busca paginada no conteúdo importado.  
+> Ambiente totalmente conteinerizado com Docker Compose.
 
-Todo o ambiente de desenvolvimento é conteinerizado com Docker Compose, garantindo padronização e facilidade de setup.
+---
 
-🚀 Stack Utilizada
+## 🚀 Stack Utilizada
 
-Linguagem: PHP ^8.2
+- 🐘 **PHP** ^8.2  
+- ⚡ **Laravel** ^12.0  
+- 🛢 **MySQL**  
+- 🐳 **Docker & Docker Compose**  
+- 🧪 **Laravel Tinker**  
+- 📘 **Swagger (OpenAPI)**  
 
-Framework: Laravel ^12.0
+---
 
-Banco de Dados: MySQL
+## ✨ Funcionalidades
 
-Containerização: Docker & Docker Compose
+- 📤 Upload de arquivos CSV
+- 🔐 Prevenção de duplicidade via hash
+- 📥 Importação dos dados para o banco
+- 🕓 Histórico de arquivos enviados
+- 🔎 Busca paginada nos dados importados
+- 📚 Documentação interativa da API
 
-Debug: laravel/tinker ^2.10.1
+---
 
-Documentação: OpenAPI (Swagger)
+## ⚙️ Instalação
 
-📦 Funcionalidades
+### 📌 Pré-requisitos
 
-Upload de arquivos CSV via API
+- Docker (Engine + CLI)
+- Docker Compose
 
-Controle de duplicidade utilizando hash do arquivo
+---
 
-Importação do conteúdo do CSV para o banco de dados
+## 🔧 Configuração do Ambiente
 
-Histórico de arquivos enviados
+Crie o arquivo `.env` baseado no `.env.example`:
 
-Busca paginada nos dados importados
-
-Documentação interativa com Swagger UI
-
-⚙️ Instalação e Configuração
-Pré-requisitos
-
-Docker (Docker Engine + Docker CLI)
-
-Docker Compose (normalmente incluído no Docker Desktop)
-
-🔧 Configurar o Ambiente
-
-Crie o arquivo .env a partir do .env.example e ajuste as variáveis abaixo:
-
+```env
 DB_CONNECTION=mysql
 DB_HOST=desafio-db-1
 DB_PORT=3306
 DB_DATABASE=desafio-ot
 DB_USERNAME=root
 DB_PASSWORD=senhadobancoaqui
+```
 
-🐳 Build e Inicialização dos Containers
+### 🐳 Build e Inicialização dos Containers
+```bash
+DB_CONNECTION=mysql
+DB_HOST=desafio-db-1
+DB_PORT=3306
+DB_DATABASE=desafio-ot
+DB_USERNAME=root
+DB_PASSWORD=senhadobancoaqui
+```
 
-Execute o comando abaixo para construir as imagens e iniciar os serviços (Laravel, Nginx e MySQL):
-
-docker-compose up --build -d
-
-🛠️ Configuração do Laravel
-
-Após os containers estarem ativos, execute os comandos dentro do container da aplicação:
-
-Instalar dependências PHP
+📦 Instalar dependências
+```bash
 docker exec -it desafio-app-1 composer install
-
-Gerar a chave da aplicação
+```
+🔑 Gerar chave da aplicação
+```bash
 docker exec -it desafio-app-1 php artisan key:generate
-
-Executar as migrações
+```
+🗄 Executar migrações
+```bash
 docker exec -it desafio-app-1 php artisan migrate
-
-🧪 Comandos Essenciais para Debug
-Visualizar logs do Laravel
+```
+## 🧪 Debug & Utilidades
+📄 Logs do Laravel
+```bash
 docker exec -it desafio-app-1 tail -f storage/logs/laravel.log
-
-Acessar o MySQL
+```
+🛢 Acessar MySQL
+```bash
 docker exec -it desafio-db-1 mysql -u root -p
-
-Limpar dados para novos testes
-
-Dentro do MySQL:
-
+```
+♻️ Limpar dados para novos testes
+```sql
 USE `desafio-ot`;
 
 TRUNCATE TABLE uploaded_files;
 TRUNCATE TABLE file_contents;
-
-Acessar o bash do container da aplicação
-docker exec -it desafio-app-1 bash
-
-📚 Documentação da API (Swagger)
-
-A API possui documentação interativa utilizando Swagger UI.
-
-URL de acesso:
-
-GET http://localhost:8080/api/documentation
-
-🔌 Endpoints da API
-Upload de arquivo CSV
-
-Realiza o upload e importa o conteúdo do arquivo.
-
+```
+## 🔌 Endpoints
+📤 Upload de Arquivo CSV
+```http
 POST /api/upload
-
-
-Espera multipart/form-data
+multipart/form-data
 
 Campo obrigatório: file
+```
 
-Histórico de uploads
+🕓 Histórico de Uploads
+```http
+GET /api/file-search
+```
+🔎 Busca no Conteúdo Importado
+```http
+GET /api/content-search
+```
 
-Lista todos os arquivos enviados.
+## 📌 Observações Finais
+Testes realizados via Insomnia
 
-GET /api/history
+Estrutura preparada para melhorias de performance
 
-Busca no conteúdo dos arquivos
+Projeto desenvolvido com foco em robustez e escalabilidade
 
-Busca paginada (20 registros por página por padrão) nos dados importados.
+# 🧑‍💻 Autor
+Desenvolvido por Pedro Lopes
 
-GET /api/file-content
+Desafio técnico – OT
