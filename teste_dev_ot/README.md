@@ -12,19 +12,16 @@
 - 🛢 **MySQL**  
 - 🐳 **Docker & Docker Compose**  
 - 🧪 **Laravel Tinker**  
-- 📘 **Swagger (OpenAPI)**  
 
 ---
 
 ## ✨ Funcionalidades
 
-- 📤 Upload de arquivos CSV
+- 📤 Upload de arquivos CSV / Excel
 - 🔐 Prevenção de duplicidade via hash
 - 📥 Importação dos dados para o banco
 - 🕓 Histórico de arquivos enviados
 - 🔎 Busca paginada nos dados importados
-- 📚 Documentação interativa da API
-
 ---
 
 ## ⚙️ Instalação
@@ -92,8 +89,6 @@ TRUNCATE TABLE file_contents;
 ```http
 POST /api/upload
 multipart/form-data
-
-Campo obrigatório: file
 ```
 
 🕓 Histórico de Uploads
